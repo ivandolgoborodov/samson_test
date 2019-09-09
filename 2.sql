@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Сен 06 2019 г., 17:33
+-- Время создания: Сен 09 2019 г., 15:34
 -- Версия сервера: 5.6.43-log
 -- Версия PHP: 5.6.38
 
@@ -31,7 +31,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `a_category` (
   `product_code` int(100) NOT NULL,
   `id` int(100) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `name` varchar(255) NOT NULL,
+  `parent_id` int(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -41,6 +42,7 @@ CREATE TABLE `a_category` (
 --
 
 CREATE TABLE `a_price` (
+  `id` int(100) NOT NULL,
   `id_product` int(100) NOT NULL,
   `type` varchar(255) NOT NULL,
   `value` float NOT NULL
@@ -65,9 +67,10 @@ CREATE TABLE `a_product` (
 --
 
 CREATE TABLE `a_property` (
+  `id` int(100) NOT NULL,
   `id_product` int(100) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `value` int(100) NOT NULL
+  `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -78,12 +81,16 @@ CREATE TABLE `a_property` (
 -- Индексы таблицы `a_category`
 --
 ALTER TABLE `a_category`
-  ADD KEY `product_code` (`product_code`);
+  ADD UNIQUE KEY `id_2` (`id`),
+  ADD KEY `product_code` (`product_code`),
+  ADD KEY `id` (`id`),
+  ADD KEY `parent_id` (`parent_id`);
 
 --
 -- Индексы таблицы `a_price`
 --
 ALTER TABLE `a_price`
+  ADD UNIQUE KEY `id` (`id`),
   ADD KEY `id_product` (`id_product`);
 
 --
@@ -91,23 +98,15 @@ ALTER TABLE `a_price`
 --
 ALTER TABLE `a_product`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
   ADD KEY `code` (`code`);
 
 --
 -- Индексы таблицы `a_property`
 --
 ALTER TABLE `a_property`
+  ADD UNIQUE KEY `id` (`id`),
   ADD KEY `id_product` (`id_product`);
-
---
--- AUTO_INCREMENT для сохранённых таблиц
---
-
---
--- AUTO_INCREMENT для таблицы `a_product`
---
-ALTER TABLE `a_product`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -117,7 +116,8 @@ ALTER TABLE `a_product`
 -- Ограничения внешнего ключа таблицы `a_category`
 --
 ALTER TABLE `a_category`
-  ADD CONSTRAINT `a_category_ibfk_1` FOREIGN KEY (`product_code`) REFERENCES `a_product` (`code`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `a_category_ibfk_1` FOREIGN KEY (`product_code`) REFERENCES `a_product` (`code`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `a_category_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `a_category` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
 --
 -- Ограничения внешнего ключа таблицы `a_price`
